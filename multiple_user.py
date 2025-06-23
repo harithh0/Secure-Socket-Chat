@@ -29,6 +29,7 @@ def handle_client(conn, addr):
     print("total users", total_users)
     with conn:
         print(f"connected from {addr}")
+        conn.sendall(b"SERVER:SUCCESS")
         send_connection_msg(conn,
                             f"{GREEN}{addr[0]} connected{RESET}\n".encode())
         total_users.append(conn)
