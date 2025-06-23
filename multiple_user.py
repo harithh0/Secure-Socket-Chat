@@ -52,6 +52,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # while True:
     while True:
         conn, addr = s.accept()
+        print(total_users)
         thread = threading.Thread(target=handle_client,
                                   args=(conn, addr),
                                   daemon=True)
