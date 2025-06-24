@@ -91,6 +91,7 @@ class ChatServer:
                 user_socket.sendall(f"SERVER: {msg}".encode())
 
     def clean_close(self):
+        # close all user sockets
         for user_obj in self.total_users:
             user_obj.socket.sendall(b"SERVER:CLOSE")
             user_obj.socket.close()
