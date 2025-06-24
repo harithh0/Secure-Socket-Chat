@@ -64,8 +64,11 @@ def main():
     chat = ChatClient(username)
     connection_result = chat.connect_to_server()
     if connection_result == 1:
-        print("yay")
+        print("Successfuly connected")
         chat.handle_chatting()
+    else:
+        print("Unable to connect")
+        return
 
 
 main()
