@@ -3,6 +3,16 @@ import threading
 from collections.abc import Buffer
 from typing import List
 
+# from cryptography.hazmat.primitives import hashes, serialization
+# from cryptography.hazmat.primitives.asymmetric import padding, rsa
+#
+# # loads keys
+# with open("public_key.pem", "rb") as f:
+#     public_key = serialization.load_pem_public_key(f.read())
+#
+# with open("private_key.pem", "rb") as f:
+#     private_key = serialization.load_pem_private_key(f.read(), password=None)
+
 RED = "\033[31m"
 GREEN = "\033[32m"
 RESET = "\033[0m"

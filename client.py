@@ -2,9 +2,15 @@ import socket
 import threading
 import time
 
+# from cryptography.hazmat.primitives import hashes, serialization
+# from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.formatted_text import ANSI
 from prompt_toolkit.patch_stdout import patch_stdout
+
+# loads keys
+# with open("public_key.pem", "rb") as f:
+#     public_key = serialization.load_pem_public_key(f.read())
 
 SERVER_PORT = 8888
 SERVER_IP = "localhost"
