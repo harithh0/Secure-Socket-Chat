@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.formatted_text import ANSI
@@ -9,6 +10,20 @@ SERVER_PORT = 8888
 SERVER_IP = "localhost"
 
 session = PromptSession()
+
+# def typing_watcher(session):
+#     was_typing = False
+#     while True:
+#         time.sleep(0.1)
+#         is_typing = bool(session.default_buffer.text)
+#         if is_typing and not was_typing:
+#             print("[Typing started]")
+#         elif not is_typing and was_typing:
+#             print("[Typing stopped]")
+#         was_typing = is_typing
+#
+#
+# threading.Thread(target=typing_watcher, args=(session, ), daemon=True).start()
 
 
 class ChatClient:

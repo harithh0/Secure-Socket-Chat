@@ -65,7 +65,9 @@ class ChatServer:
             for user in self.total_users
             if user.socket != client_obj_to_send_to.socket
         ]
-        client_obj_to_send_to.socket.sendall("\n".join(msg).encode())
+        client_obj_to_send_to.socket.sendall(
+            f"SERVER: {GREEN}TOTAL USERS CONNECTED:\n{RESET}{RED}{'\n'.join(msg)} {RESET}"
+            .encode())
 
     def send_msg_to_all(self, client_obj_sending, msg: bytes):
         for user_obj in self.total_users:
@@ -93,6 +95,7 @@ def main():
     chat_server = ChatServer()
     chat_server.bind_n_listen()
     chat_server.accept_clients()
+    # TODO: Close server cleanly when doing ctrl+c
 
 
 main()
