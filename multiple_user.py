@@ -40,52 +40,70 @@ class ChatServer:
             print(f"connected from {addr}")
             username = conn.recv(1024)
             if username:
-                self.total_users.append({
-                    "username": username.decode(),
-                    "user_socket": conn
-                })
+                client_obj = Client(username.decode(), conn)
+                self.total_users.append(client_obj)
                 conn.sendall(b"SERVER:SUCCESS")
-            self.send_connection_msg(username.decode(), conn)
+                if len(self.total_users) > 1:
+                    self.send_total_users(client_obj)
+                self.send_connection_msg(client_obj, "connect")
+            else:
+                return
             while True:
                 data = conn.recv(1024)
                 print("data recv:", data.decode())
                 if not data:  # if len of data sent is 0 -> means use disconnected
                     print(f"disconnected from {addr}")
-
-                    self.send_connection_msg(conn)
-
-                    self.total_users.remove(conn)
+                    self.send_connection_msg(client_obj, "disconnect")
+                    self.total_users.remove(client_obj)
                     break
                 if data != " ":
-                    self.send_msg_to_all(username.decode(), conn, data)
+                    self.send_msg_to_all(client_obj, data)
 
-    def send_msg_to_all(self, user_sending_msg_username,
-                        user_sending_conn: socket.socket, msg: bytes):
-        for user in self.total_users:
-            user_socket = user.get("user_socket")
-            if user_socket != user_sending_conn:
+    def send_total_users(self, client_obj_to_send_to):
+        msg = [
+            f"{user.username} from {user.socket.getpeername()[0]}"
+            for user in self.total_users
+            if user.socket != client_obj_to_send_to.socket
+        ]
+        client_obj_to_send_to.socket.sendall("\n".join(msg).encode())
+
+    def send_msg_to_all(self, client_obj_sending, msg: bytes):
+        for user_obj in self.total_users:
+            user_socket = user_obj.socket
+            if user_socket != client_obj_sending.socket:
                 full_message = (
-                    f"{RED}{user_sending_msg_username}:{RESET} {msg.decode()}")
+                    f"{RED}{client_obj_sending.username}:{RESET} {msg.decode()}"
+                )
                 user_socket.sendall(full_message.encode())
 
-    def send_connection_msg(self, username: str,
-                            user_sending_conn: socket.socket):
-        msg = f"{GREEN}{username} connected from {user_sending_conn.getpeername()[0]} {RESET}\n".encode(
-        )
-        for user in self.total_users:
-            user_socket = user.get("user_socket")
-            if user_socket != user_sending_conn:
-                user_socket.sendall(msg)
+    def send_connection_msg(self, client_obj, status: str):
+        if status == "connect":
+            msg = f"{GREEN}{client_obj.username} connected from {client_obj.socket.getpeername()[0]} {RESET}"
+        elif status == "disconnect":
+            msg = f"{GREEN}{client_obj.username} disconnected {RESET}"
+        else:
+            msg = "something went wrong"
+        for user_obj in self.total_users:
+            user_socket = user_obj.socket
+            if user_socket != client_obj.socket:
+                user_socket.sendall(f"SERVER: {msg}".encode())
 
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-    # while True:
-    while True:
-        conn, addr = s.accept()
-        print(total_users)
-        thread = threading.Thread(target=handle_client,
-                                  args=(conn, addr),
-                                  daemon=True)
-        thread.start()
+def main():
+    chat_server = ChatServer()
+    chat_server.bind_n_listen()
+    chat_server.accept_clients()
+
+
+main()
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+#     s.bind((HOST, PORT))
+#     s.listen()
+#     # while True:
+#     while True:
+#         conn, addr = s.accept()
+#         print(total_users)
+#         thread = threading.Thread(target=handle_client,
+#                                   args=(conn, addr),
+#                                   daemon=True)
+#         thread.start()
