@@ -1,10 +1,18 @@
 import socket
+import threading
+
+from prompt_toolkit import PromptSession, print_formatted_text
+from prompt_toolkit.formatted_text import ANSI
+from prompt_toolkit.patch_stdout import patch_stdout
 
 SERVER_PORT = 8888
 SERVER_IP = "localhost"
 
+session = PromptSession()
+
 
 class ChatClient:
+
     def __init__(self, username, server_ip=SERVER_IP, server_port=SERVER_PORT):
         self.username = username
         self.server_ip = server_ip
@@ -24,14 +32,22 @@ class ChatClient:
         if x.decode() == "SERVER:SUCCESS":
             return 1
 
-    def handle_chatting(self):
-        x = input(">\r")
+    def __listen_for_messages(self):
         while True:
             chunk = self.socket.recv(1024)
             if not chunk:  # if chunk is empty
                 break
             else:
-                print(chunk.decode())
+                with patch_stdout():
+                    # prints with supporting ANSI (color) from server
+                    print_formatted_text(ANSI(f"{chunk.decode()}"))
+
+    def handle_chatting(self):
+        threading.Thread(target=self.__listen_for_messages,
+                         daemon=True).start()
+        while True:
+            user_input = session.prompt("> ")
+            self.socket.sendall(user_input.encode())
 
 
 def main():
