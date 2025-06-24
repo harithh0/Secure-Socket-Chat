@@ -52,6 +52,10 @@ class ChatClient:
             chunk = self.socket.recv(1024)
             if not chunk:  # if chunk is empty
                 break
+            elif chunk.decode() == "SERVER:CLOSE":
+                self.socket.close()
+                print("server closed exitting...")
+                exit()
             else:
                 with patch_stdout():
                     # prints with supporting ANSI (color) from server
@@ -62,7 +66,11 @@ class ChatClient:
                          daemon=True).start()
         while True:
             user_input = session.prompt("> ")
-            self.socket.sendall(user_input.encode())
+            try:
+                self.socket.sendall(user_input.encode())
+            except Exception:
+                print("something went wrong sending message to server")
+                exit()
 
 
 def main():

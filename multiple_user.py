@@ -90,23 +90,18 @@ class ChatServer:
             if user_socket != client_obj.socket:
                 user_socket.sendall(f"SERVER: {msg}".encode())
 
+    def clean_close(self):
+        for user_obj in self.total_users:
+            user_obj.socket.sendall(b"SERVER:CLOSE")
+            user_obj.socket.close()
+        self.server_socket.close()
+        print("\nclosed socket server cleanly")
+        return
 
-def main():
+
+try:
     chat_server = ChatServer()
     chat_server.bind_n_listen()
     chat_server.accept_clients()
-    # TODO: Close server cleanly when doing ctrl+c
-
-
-main()
-# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-#     s.bind((HOST, PORT))
-#     s.listen()
-#     # while True:
-#     while True:
-#         conn, addr = s.accept()
-#         print(total_users)
-#         thread = threading.Thread(target=handle_client,
-#                                   args=(conn, addr),
-#                                   daemon=True)
-#         thread.start()
+except KeyboardInterrupt:
+    chat_server.clean_close()
