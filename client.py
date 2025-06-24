@@ -25,6 +25,7 @@ class ChatClient:
             return 1
 
     def handle_chatting(self):
+        x = input(">\r")
         while True:
             chunk = self.socket.recv(1024)
             if not chunk:  # if chunk is empty
