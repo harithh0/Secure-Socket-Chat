@@ -1,7 +1,6 @@
 import socket
 import ssl
 import threading
-import time
 
 from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.formatted_text import ANSI

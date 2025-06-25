@@ -32,6 +32,7 @@ class ChatServer:
         self.server_socket.listen()
 
     def accept_clients(self):
+        print("Server is listening")
         while True:
             conn, addr = self.server_socket.accept()
 
@@ -107,9 +108,12 @@ class ChatServer:
         return
 
 
+chat_server = None
+
 try:
     chat_server = ChatServer()
     chat_server.bind_n_listen()
     chat_server.accept_clients()
 except KeyboardInterrupt:
-    chat_server.clean_close()
+    if chat_server:
+        chat_server.clean_close()
