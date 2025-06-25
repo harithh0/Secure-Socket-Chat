@@ -34,6 +34,7 @@ class ChatServer:
     def accept_clients(self):
         while True:
             conn, addr = self.server_socket.accept()
+
             # Wrap the accepted client connection
             secure_conn = self.context.wrap_socket(conn, server_side=True)
             thread = threading.Thread(target=self.handle_client,
