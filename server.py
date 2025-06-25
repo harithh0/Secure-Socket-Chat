@@ -1,17 +1,7 @@
 import socket
+import ssl
 import threading
-from collections.abc import Buffer
 from typing import List
-
-# from cryptography.hazmat.primitives import hashes, serialization
-# from cryptography.hazmat.primitives.asymmetric import padding, rsa
-#
-# # loads keys
-# with open("public_key.pem", "rb") as f:
-#     public_key = serialization.load_pem_public_key(f.read())
-#
-# with open("private_key.pem", "rb") as f:
-#     private_key = serialization.load_pem_private_key(f.read(), password=None)
 
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -33,6 +23,10 @@ class ChatServer:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.total_users: List[Client] = []
 
+        # load ssl certs
+        self.context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        self.context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
+
     def bind_n_listen(self):
         self.server_socket.bind((self.server_ip, self.server_port))
         self.server_socket.listen()
@@ -40,8 +34,10 @@ class ChatServer:
     def accept_clients(self):
         while True:
             conn, addr = self.server_socket.accept()
+            # Wrap the accepted client connection
+            secure_conn = self.context.wrap_socket(conn, server_side=True)
             thread = threading.Thread(target=self.handle_client,
-                                      args=(conn, addr),
+                                      args=(secure_conn, addr),
                                       daemon=True)
             thread.start()
 

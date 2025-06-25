@@ -1,16 +1,11 @@
 import socket
+import ssl
 import threading
 import time
 
-# from cryptography.hazmat.primitives import hashes, serialization
-# from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.formatted_text import ANSI
 from prompt_toolkit.patch_stdout import patch_stdout
-
-# loads keys
-# with open("public_key.pem", "rb") as f:
-#     public_key = serialization.load_pem_public_key(f.read())
 
 SERVER_PORT = 8888
 SERVER_IP = "localhost"
@@ -24,7 +19,15 @@ class ChatClient:
         self.username = username
         self.server_ip = server_ip
         self.server_port = server_port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.context = ssl.create_default_context()
+
+        # WARN: for self signed certs only:
+        self.context.check_hostname = False
+        self.context.verify_mode = ssl.CERT_NONE
+
+        # TODO: make sure to add 'server_hostname' from the FQDN when creating cert
+        self.socket = self.context.wrap_socket(
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM))
 
     def connect_to_server(self):
         try:
