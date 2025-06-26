@@ -8,7 +8,8 @@ A minimal command-line chat application built using Python's `socket`, `ssl`, an
 ### 1. Generate SSL Certificate
 
 Before starting the server, generate the `cert.pem` and `key.pem`:
-This creates a **self-signed** certificate valid for `localhost`.
+
+- This creates a **self-signed** certificate valid for `localhost`.
 
 ```bash
 python3 generate_cert.py
