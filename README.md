@@ -1,9 +1,9 @@
-# 🔐 Secure Socket Chat
+# Secure Socket Chat
 
 A minimal command-line chat application built using Python's `socket`, `ssl`, and `threading` libraries. It enables encrypted communication between multiple clients via a central server.
 
 
-## 🛠️ Setup
+## Setup
 
 ### 1. Generate SSL Certificate
 
