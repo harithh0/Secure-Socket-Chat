@@ -1,6 +1,7 @@
 import socket
 import ssl
 import threading
+from datetime import datetime
 
 from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.formatted_text import ANSI
@@ -53,7 +54,10 @@ class ChatClient:
             else:
                 with patch_stdout():
                     # prints with supporting ANSI (color) from server
-                    print_formatted_text(ANSI(f"{chunk.decode()}"))
+                    print_formatted_text(
+                        ANSI(
+                            f"[{datetime.now().strftime('%H:%M:%S')}] {chunk.decode()}"
+                        ))
 
     def handle_chatting(self):
         threading.Thread(target=self.__listen_for_messages,
