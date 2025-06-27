@@ -71,7 +71,7 @@ class ChatServer:
         msg = [
             f"{user.username} from {user.socket.getpeername()[0]}"
             for user in self.total_users
-            if user.socket != client_obj_to_send_to.socket
+            if user.socket.fileno() != client_obj_to_send_to.socket.fileno()
         ]
         client_obj_to_send_to.socket.sendall(
             f"SERVER: {GREEN}TOTAL USERS CONNECTED:\n{RESET}{RED}{'\n'.join(msg)} {RESET}"
@@ -80,7 +80,8 @@ class ChatServer:
     def send_msg_to_all(self, client_obj_sending, msg: bytes):
         for user_obj in self.total_users:
             user_socket = user_obj.socket
-            if user_socket != client_obj_sending.socket:
+            # using `fileno()` on a socket object to return the sockets file descriptor number, which is a low-level integer used by the operating system to identify the socket
+            if user_socket.fileno() != client_obj_sending.socket.fileno():
                 full_message = (
                     f"{RED}{client_obj_sending.username}:{RESET} {msg.decode()}"
                 )
@@ -95,7 +96,7 @@ class ChatServer:
             msg = "something went wrong"
         for user_obj in self.total_users:
             user_socket = user_obj.socket
-            if user_socket != client_obj.socket:
+            if user_socket.fileno() != client_obj.socket.fileno():
                 user_socket.sendall(f"SERVER: {msg}".encode())
 
     def clean_close(self):
